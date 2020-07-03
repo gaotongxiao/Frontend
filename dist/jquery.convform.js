@@ -355,7 +355,8 @@ ConvState.prototype.answerWith = function(answerText, answerObject) {
             }
 
             //appends messages wrapper and newly created form with the spinner load
-            $(wrapper).append('<div class="wrapper-messages"><div class="spinLoader ' + parameters.loadSpinnerVisible + ' "></div><div id="messages"></div></div>');
+            $(wrapper).append('<div class="wrapper-messages"><div class=""></div><div id="messages"></div></div>');
+            // $(wrapper).append('<div class="wrapper-messages"><div class="spinLoader ' + parameters.loadSpinnerVisible + ' "></div><div id="messages"></div></div>');
             $(wrapper).append(inputForm);
 
             //creates new single state with first input
