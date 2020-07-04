@@ -22,6 +22,25 @@
 </head>
 
 <body>
+	<div class="modal fade" id="info-modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle"
+		aria-hidden="true">
+		<div class="modal-lg modal-dialog modal-dialog-centered modal-dialog-scrollable" role="document">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title"></h5>
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+						<span aria-hidden="true">&times;</span>
+					</button>
+				</div>
+				<div class="modal-body">
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-secondary" data-dismiss="modal">关闭</button>
+					<!-- <button type="button" class="btn btn-primary">Save changes</button> -->
+				</div>
+			</div>
+		</div>
+	</div>
 	<section id="demo">
 		<div class="vertical-align">
 			<div class="container">
@@ -89,20 +108,44 @@
 		jQuery(function ($) {
 			$(document).ready(function () {
 				dr_chart = echarts.init(document.getElementById('doctor_stat'));
-				// test = dr_chart;
 				data = {
-					full: [['D', Math.floor(Math.random() * 100)], ['C', Math.floor(Math.random() * 100)], ['B', Math.floor(Math.random() * 100)], ['A', Math.floor(Math.random() * 100)]],
-					DSM: [['D', Math.floor(Math.random() * 100)], ['C', Math.floor(Math.random() * 100)], ['B', Math.floor(Math.random() * 100)], ['A', Math.floor(Math.random() * 100)]],
-					Bayesian: [['D', Math.floor(Math.random() * 100)], ['C', Math.floor(Math.random() * 100)], ['B', Math.floor(Math.random() * 100)], ['A', Math.floor(Math.random() * 100)]],
-					sentimental: [['D', Math.floor(Math.random() * 100)], ['C', Math.floor(Math.random() * 100)], ['B', Math.floor(Math.random() * 100)], ['A', Math.floor(Math.random() * 100)]],
-					DL: [['C', Math.floor(Math.random() * 100)], ['B', Math.floor(Math.random() * 100)], ['A', Math.floor(Math.random() * 100)]],
+					full: [ {name: 'D', value: Math.floor(Math.random()*100), explanation: {"D解释1": "balabala", "D解释2": "balabala"}}, 
+							{name: 'C', value: Math.floor(Math.random()*100), explanation: {"C解释1": "balabala", "C解释2": "balabala"}},
+							{name: 'B', value: Math.floor(Math.random()*100), explanation: {"B解释1": "balabala", "B解释2": "balabala"}},
+							{name: 'A', value: Math.floor(Math.random()*100), explanation: {"A解释1": "balabala", "A解释2": "balabala"}}],
+					DSM: [ {name: 'D', value: Math.floor(Math.random()*100), explanation: {"D解释1": "balabala", "D解释2": "balabala"}}, 
+							{name: 'C', value: Math.floor(Math.random()*100), explanation: {"C解释1": "balabala", "C解释2": "balabala"}},
+							{name: 'B', value: Math.floor(Math.random()*100), explanation: {"B解释1": "balabala", "B解释2": "balabala"}},
+							{name: 'A', value: Math.floor(Math.random()*100), explanation: {"A解释1": "balabala", "A解释2": "balabala"}}],
+					Bayesian: [{name: 'D', value: Math.floor(Math.random()*100), explanation: {"D解释1": "balabala", "D解释2": "balabala"}}, 
+							{name: 'C', value: Math.floor(Math.random()*100), explanation: {"C解释1": "balabala", "C解释2": "balabala"}},
+							{name: 'B', value: Math.floor(Math.random()*100), explanation: {"B解释1": "balabala", "B解释2": "balabala"}},
+							{name: 'A', value: Math.floor(Math.random()*100), explanation: {"A解释1": "balabala", "A解释2": "balabala"}}],
+					sentimental: [{name: 'D', value: Math.floor(Math.random()*100), explanation: {"D解释1": "balabala", "D解释2": "balabala"}}, 
+							{name: 'C', value: Math.floor(Math.random()*100), explanation: {"C解释1": "balabala", "C解释2": "balabala"}},
+							{name: 'B', value: Math.floor(Math.random()*100), explanation: {"B解释1": "balabala", "B解释2": "balabala"}},
+							{name: 'A', value: Math.floor(Math.random()*100), explanation: {"A解释1": "balabala", "A解释2": "balabala"}}],
+					DL: [{name: 'D', value: Math.floor(Math.random()*100), explanation: {"D解释1": "balabala", "D解释2": "balabala"}}, 
+							{name: 'C', value: Math.floor(Math.random()*100), explanation: {"C解释1": "balabala", "C解释2": "balabala"}},
+							{name: 'A', value: Math.floor(Math.random()*100), explanation: {"A解释1": "balabala", "A解释2": "balabala"}}]
 				}
 
 				$("#btn-group :input").on("change",function () {
 					update_dr_data(dr_chart, data[this.value]);
+					fill_explanation("#info-modal", data, this.value);
 				});
-				// visualize_dr_data(dr_chart);
 				update_dr_data(dr_chart, data.full);
+					fill_explanation("#info-modal", data, 'full');
+
+				dr_chart.on('click', function(p){
+					// alert(p.paramIdx);
+					$('#info-modal').on('shown.bs.modal', function () {
+						$(".modal-body").animate({scrollTop: $("#" + p.dataIndex).offset().top - 40}, 0);
+						// $(".modal-body").animate({scrollTop: 1000}, 50);
+					});
+					$("#info-modal").modal("show");
+					// requestAnimationFrame(() => $(".modal-body").animate({scrollTop: $("#" + p.dataIndex).offset().top - 40}, 500));
+				});
 			});
 		});
 	</script>

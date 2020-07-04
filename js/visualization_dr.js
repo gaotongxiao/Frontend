@@ -66,18 +66,23 @@ function update_dr_data(myChart, data) {
     var y = new Array();
     var series = new Array();
     for (d of data) {
-        y.push(d[0]);
-        series.push(d[1]);
+        y.push(d.name);
+        series.push(d.value);
     }
     option.yAxis[0].data = y;
     option.series[0].data = series;
     myChart.setOption(option);
 }
-// function visualize_dr_data(myChart) {
-//     // var myChart = echarts.init();
-//     $.ajax({
-//         url: "wuhan.json",
-//         success: function (data) 
-//     });
-// }
-// });
+
+function fill_explanation(modal_selector_str, data, category) {
+    $(modal_selector_str).find('.modal-title').text("解释");
+    var text = '<h1>' + category + '</h1><hr />';
+    for (const [i, term] of data[category].entries()) {
+        text += '<h2 id="' + i + '">' + term.name + '</h2><hr />';
+        for (const [k, v] of Object.entries(term.explanation)) {
+            text += '<h3>' + k + '</h3><hr />';
+            text += '<p>' + v + '</p><hr />';
+        }
+    }
+    $(modal_selector_str).find('.modal-body').html(text);
+}
