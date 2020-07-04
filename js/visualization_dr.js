@@ -78,11 +78,13 @@ function fill_explanation(modal_selector_str, data, category) {
     $(modal_selector_str).find('.modal-title').text("解释");
     var text = '<h1>' + category + '</h1><hr />';
     for (const [i, term] of data[category].entries()) {
-        text += '<h2 id="' + i + '">' + term.name + '</h2><hr />';
+        text += '<div id="' + i + '">';
+        text += '<h2>' + term.name + '</h2><hr />';
         for (const [k, v] of Object.entries(term.explanation)) {
             text += '<h3>' + k + '</h3><hr />';
             text += '<p>' + v + '</p><hr />';
         }
+        text += '</div>';
     }
     $(modal_selector_str).find('.modal-body').html(text);
 }
