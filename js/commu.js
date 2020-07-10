@@ -1,3 +1,6 @@
+var server_addr = 'http://localhost:5005/webhooks/rest/webhook'
+var sender_id = Math.random().toString(36).substring(7); // random id
+
 function on_success(res) {
     alert("Successful!");
 }
@@ -23,4 +26,13 @@ function send_msg(url, data, success_callback = on_success, error_callback = on_
         success: success_callback,
         error: error_callback
     });
+}
+
+function wrap_ans(answer) {
+    
+    var ret = {
+        message: answer, 
+        sender: sender_id
+    };
+    return ret;
 }

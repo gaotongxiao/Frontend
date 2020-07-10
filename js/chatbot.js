@@ -1,15 +1,15 @@
 jQuery(function ($) {
     function append_message(message) {
-        $("#messages").append("<div class=\"message to ready\">"+ message + "</div>");
-        $(".conv-form-wrapper").find('#messages').stop().animate({scrolltop: $(".conv-form-wrapper").find('#messages')[0].scrollheight}, 600);
+        $("#messages").append("<div class=\"message to ready\">" + message + "</div>");
+        $(".conv-form-wrapper").find('#messages').stop().animate({ scrolltop: $(".conv-form-wrapper").find('#messages')[0].scrollheight }, 600);
     }
 
-    function visualize_on_render(boxid, callback) {
+    function visualize_on_render(visualization_func, boxid, data) {
         if (!document.getElementById(boxid)) {
-            setTimeout(visualize_on_render, 100, boxid, callback);
+            setTimeout(visualize_on_render, 100, visualization_func, boxid, data);
             return;
         }
-        callback(boxid);
+        visualization_func(boxid, data);
     }
 
     var count = 0;
@@ -23,57 +23,45 @@ jQuery(function ($) {
                     convState.current.next = false;
                     //emulating random response time (100-600ms)
                     setTimeout(ready, Math.random() * 500 + 100);
-                } else if (convState.current.answer.value === 'write') {
-                    convState.current.next = convState.newState({
-                        type: 'input',
-                        name: 'dynamic-question-' + count,
-                        questions: ['Enter a random string'],
-                    });
-                    setTimeout(ready, Math.random() * 500 + 100);
-                } else if (convState.current.answer.value === 'visualization') {
-                    // convForm.dialogue = 0;
-                    convState.current.next = convState.newState({
-                        type: 'input',
-                        noAnswer: true,
-                        name: 'dynamic-question-' + count++,
-                        questions: ['以下是武汉疫情数据:'],
-                    });
-                    convState.current.next.next = convState.newState({
-                        type: 'input',
-                        noAnswer: false,
-                        name: 'dynamic-question-' + count,
-                        questions: ['<div id="v' + visualization_count +  '" style="width:300px;height:300px;"></div>'],
-                    });
-                    ready();
-                    visualize_on_render('v' + visualization_count, visualize_covid_data)
-                    // $('body').on('load', '#v' + visualization_count, visualize_covid_data('v' + visualization_count, 1));
-                    visualization_count++;
-                    // setTimeout(ready, Math.random() * 500 + 100);
                 } else {
                     if (Array.isArray(convState.current.answer)) var answer = convState.current.answer.join(', ');
                     else var answer = convState.current.answer.text;
-                    convState.current.next = convState.newState({
-                        type: 'select',
-                        noAnswer: true,
-                        name: 'dynamic-question-' + count,
-                        questions: ['This question state was built on your previous answer (you answered: ' + answer + ') and doesnt expect an answer'],
-                    });
-                    setTimeout(ready, Math.random() * 500 + 100);
-                    convState.current.next.next = convState.newState({
-                        type: 'select',
-                        name: 'dynamic-question-' + count,
-                        questions: ['This question state was built on your previous answer (you answered: ' + answer + ')'],
-                        answers: [
-                            { text: '写答案', value: 'write' },
-                            { text: '选答案', value: 'choose' },
-                            { text: '可视化', value: 'visualization' },
-                            { text: 'END', value: 'end' }
-                        ]
-                    });
-                    //emulating random response time (100-600ms)
-                    setTimeout(ready, Math.random() * 500 + 100);
+                    send_msg(server_addr, wrap_ans(answer), function (res) {
+                        for (var cur_state = convState.current, i = 0; i < res.length; i++, cur_state = cur_state.next) {
+                            if (res[i].text != null) {
+                                cur_state.next = convState.newState({
+                                    type: 'input',
+                                    noAnswer: !(i == res.length - 1),
+                                    name: 'dynamic-question-' + count++,
+                                    questions: [res[i].text],
+                                });
+                            }
+                            else {
+                                cur_state.next = convState.newState({
+                                    type: 'input',
+                                    noAnswer: false,
+                                    name: 'dynamic-question-' + count++,
+                                    questions: ['<div id="v' + visualization_count + '" style="width:300px;height:300px;"></div>'],
+                                });
+                                visualize_on_render(visualize_covid_data, 'v' + visualization_count++, res[i].custom);
+                            }
+                            console.log(res[i]);
+                        }
+                        ready();
+                        gen_random_data();
+                        update_dr_data(dr_chart, data.full);
+                        fill_explanation("#info-modal", data, 'full');
+                    },
+                        function (res) {
+                            convState.current.next = convState.newState({
+                                type: 'input',
+                                noAnswer: false,
+                                name: 'dynamic-question-' + count++,
+                                questions: ['Server error!'],
+                            });
+                            ready();
+                        });
                 }
-                count++;
             }
         }
     });
